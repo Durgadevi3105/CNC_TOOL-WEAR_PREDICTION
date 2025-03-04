@@ -1,10 +1,13 @@
+
 import streamlit as st
 import pandas as pd
 import numpy as np
-import tensorflow as tf
+import pickle
+import joblib
 from tensorflow.keras.models import load_model
 from sklearn.preprocessing import StandardScaler
 import base64
+
 def set_image_local(image_path):
     with open(image_path, "rb") as file:
         img = file.read()
@@ -26,69 +29,104 @@ def set_image_local(image_path):
 
 set_image_local(r"cnc.jpg")
 
-# Load Trained LSTM Model
-lstm_model = load_model("D:\streamlit\env\CNC\cnc_model.h5")  
 
-# Title
-st.title("CNC Milling Performance Analysis & Fault Detection")
+# Load the trained LSTM model
+@st.cache_resource
+def load_lstm_model():
+    return load_model('model.h5')
 
-# Task Selection
-task = st.selectbox("Select Classification Task", 
-                    ["Tool Wear Prediction", "Clamping Detection", "Machining Completion Prediction", "All Predictions"])
+# Load the scaler
+@st.cache_resource
+def load_scaler():
+    return joblib.load('scaler.pkl')
 
-# Define feature columns
-feature_columns = [
-    "feedrate", "clamp_pressure", "material",  
-    "M1_CURRENT_FEEDRATE", "X1_ActualPosition", "Y1_ActualPosition",  
-    "Z1_ActualPosition", "X1_CurrentFeedback", "Y1_CurrentFeedback",  
-    "X1_DCBusVoltage", "X1_OutputPower", "Y1_OutputPower_transformed",  
-    "S1_OutputPower"
-]
+# Load label encoders
+@st.cache_resource
+def load_label_encoders():
+    label_encoders = {}
+    categorical_columns = ['tool_condition', 'machining_finalized', 'passed_visual_inspection']
+    for column in categorical_columns:
+        with open(f'label_encoder_{column}.pkl', 'rb') as file:
+            label_encoders[column] = pickle.load(file)
+    return label_encoders
 
-# File uploader
-uploaded_file = st.file_uploader("Upload CNC Sensor Data (CSV)", type=["csv"])
+# Load resources
+model = load_lstm_model()
+scaler = load_scaler()
+label_encoders = load_label_encoders()
 
-if uploaded_file:
+# Get feature names used during training
+expected_features = scaler.feature_names_in_
+
+def preprocess_data(uploaded_file):
+    """Preprocess uploaded CSV data."""
     df = pd.read_csv(uploaded_file)
-
+    df = df.drop(columns=['Unnamed: 0'], errors='ignore')
+    
     # Ensure all required features are present
-    missing_cols = [col for col in feature_columns if col not in df.columns]
-    if missing_cols:
-        st.error(f"Missing Columns in Uploaded File: {missing_cols}")
-    else:
-        # Select only necessary columns
-        df = df[feature_columns]
-        st.write("Uploaded Data Shape:", df.shape)
+    for col in expected_features:
+        if col not in df.columns:
+            df[col] = 0  # Add missing columns with default value
+    
+    # Reorder columns to match training set
+    df = df[expected_features]
+    
+    # Scale the data
+    X_scaled = scaler.transform(df)
+    X_reshaped = X_scaled.reshape((X_scaled.shape[0], 1, X_scaled.shape[1]))
+    return X_reshaped, df
 
-        # Convert categorical "material" column to numeric if present
-        if "material" in df.columns:
-            df["material"] = df["material"].astype("category").cat.codes
+def make_predictions(X):
+    """Make predictions using the trained LSTM model."""
+    predictions = model.predict(X)
+    decoded_predictions = {}
+    
+    # Decode predictions
+    for i, column in enumerate(label_encoders.keys()):
+        predicted_labels = np.argmax(predictions[i], axis=1)
+        decoded_predictions[column] = label_encoders[column].inverse_transform(predicted_labels)
+    
+    return pd.DataFrame(decoded_predictions)
 
-        # Select only numeric columns before scaling
-        numeric_cols = df.select_dtypes(include=["number"]).columns
+# Streamlit UI
+st.title("🔧 Tool Wear Prediction App")
+st.markdown(
+    """
+    ## 🔬 Overview
+         Predictive maintenance is revolutionizing manufacturing by minimizing tool failure and optimizing machining processes. 
+         This LSTM-based AI model analyzes real-time CNC sensor data to predict tool wear, ensuring efficiency and precision in machining operations.
 
-        # Apply StandardScaler
-        scaler = StandardScaler()
-        df_scaled = scaler.fit_transform(df[numeric_cols])
+    ##  ⚙️ How It Works?
+        1️⃣ Real-Time Data Collection 📊
+            Captures sensor readings (spindle speed, vibration, temperature, force).
+        2️⃣ Data Preprocessing & Feature Engineering 🧩
+            Normalizes values, removes noise, and extracts critical features.
+        3️⃣ LSTM Model for Pattern Recognition 🧠
+            Uses sequential data to detect wear progression trends.
+        4️⃣ Prediction & Decision Support ✅
+            Provides insights into tool condition and remaining lifespan.
+        5️⃣ Integration with Smart Manufacturing Systems 🌍
+            Sends alerts for tool replacement, reducing unplanned downtimes.
+    """
+)
+st.write("Upload your CSV file to predict tool wear conditions.")
 
-        # Reshape for LSTM (samples, timesteps=1, features)
-        df_reshaped = df_scaled.reshape((df_scaled.shape[0], 1, df_scaled.shape[1]))
+uploaded_file = st.file_uploader("Choose a CSV file", type=["csv"])
 
-        if st.button("Analyze"):
-            predictions = lstm_model.predict(df_reshaped)
+if uploaded_file is not None:
+    X, original_data = preprocess_data(uploaded_file)
+    predictions_df = make_predictions(X)
+    
+    # Display results
+    st.write("### Predictions")
+    st.dataframe(predictions_df)
+    
+    # Combine original data with predictions
+    final_results = pd.concat([original_data, predictions_df], axis=1)
+    st.write("### Full Data with Predictions")
+    st.dataframe(final_results)
+    
+    # Option to download predictions
+    csv = final_results.to_csv(index=False).encode('utf-8')
+    st.download_button("Download Predictions", data=csv, file_name="predictions.csv", mime="text/csv")
 
-            # Check output shape of predictions
-            st.write("Prediction Output Shape:", predictions.shape)  # Expected: (num_samples, 3)
-
-            if predictions.shape[1] != 3:
-                st.error("Error: Model output shape is incorrect! Expected 3 outputs, got:", predictions.shape[1])
-            else:
-                # Assign predictions to their respective labels
-                df["Tool Wear"] = ["Worn" if p[0] > 0.5 else "Unworn" for p in predictions]
-                df["Visual inspection"] = ["Properly Clamped" if p[1] > 0.5 else "Not Properly Clamped" for p in predictions]
-                df["Machining Completion"] = ["Completed" if p[2] > 0.5 else "Not Completed" for p in predictions]
-
-                st.write(df)
-
-                # Provide download button
-                st.download_button("Download Predictions", df.to_csv(index=False), "predictions.csv", "text/csv")
