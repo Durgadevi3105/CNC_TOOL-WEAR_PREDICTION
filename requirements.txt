@@ -1,6 +1,5 @@
-streamlit
-pandas
 numpy
-tensorflow
-sklearn
+pickle
 base64
+tensorflow
+pandas
