@@ -24,7 +24,7 @@ def set_image_local(image_path):
         unsafe_allow_html=True
     )
 
-set_image_local(r"img2.jpg")
+set_image_local(r"cnc.jpg")
 
 # Load Trained LSTM Model
 lstm_model = load_model("D:\streamlit\env\CNC\cnc_model.h5")  
