@@ -81,6 +81,7 @@ if choice == "Home":
             Provides insights into tool condition and remaining lifespan.
         5️⃣ Integration with Smart Manufacturing Systems 🌍
             Sends alerts for tool replacement, reducing unplanned downtimes.
+            
         📈 Key Benefits
            🔹 Prevents Costly Failures – Reduces sudden tool breakage and machine damage.
            🔹 Optimizes Tool Usage – Ensures tools are replaced at the right time.
