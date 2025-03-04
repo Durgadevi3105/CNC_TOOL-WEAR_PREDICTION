@@ -67,7 +67,8 @@ if choice == "Home":
     st.markdown(
         """
         🔬 Overview
-         Predictive maintenance is revolutionizing manufacturing by minimizing tool failure and optimizing machining processes. This LSTM-based AI model analyzes real-time CNC sensor data to predict tool wear, ensuring efficiency and precision in machining operations.
+         Predictive maintenance is revolutionizing manufacturing by minimizing tool failure and optimizing machining processes. 
+         This LSTM-based AI model analyzes real-time CNC sensor data to predict tool wear, ensuring efficiency and precision in machining operations.
 
         ⚙️ How It Works?
         1️⃣ Real-Time Data Collection 📊
