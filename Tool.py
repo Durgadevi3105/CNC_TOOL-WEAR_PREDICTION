@@ -92,21 +92,15 @@ def make_predictions(X):
 st.title("🔧 Tool Wear Prediction App")
 st.markdown(
     """
-    ## 🔬 Overview
-         Predictive maintenance is revolutionizing manufacturing by minimizing tool failure and optimizing machining processes. 
-         This LSTM-based AI model analyzes real-time CNC sensor data to predict tool wear, ensuring efficiency and precision in machining operations.
-
-    ##  ⚙️ How It Works?
-        1️⃣ Real-Time Data Collection 📊
-            Captures sensor readings (spindle speed, vibration, temperature, force).
-        2️⃣ Data Preprocessing & Feature Engineering 🧩
-            Normalizes values, removes noise, and extracts critical features.
-        3️⃣ LSTM Model for Pattern Recognition 🧠
-            Uses sequential data to detect wear progression trends.
-        4️⃣ Prediction & Decision Support ✅
-            Provides insights into tool condition and remaining lifespan.
-        5️⃣ Integration with Smart Manufacturing Systems 🌍
-            Sends alerts for tool replacement, reducing unplanned downtimes.
+    ## 📌 Overview
+    This project focuses on analyzing **CNC milling machine performance** and detecting faults using **deep learning techniques**. 
+    The primary objective is to predict:
+    - 🛠 **Tool Condition** (Unworn/Worn)
+    - ⚙️ **Machining Finalization** (Yes/No)
+    - 🔍 **Passed Visual Inspection** (Yes/No)
+    
+    Using **LSTM-based deep learning models**, the project processes **sensor data** collected from CNC milling experiments. 
+    The web app is built with **Streamlit** for an interactive experience.
     """
 )
 st.write("Upload your CSV file to predict tool wear conditions.")
@@ -129,4 +123,5 @@ if uploaded_file is not None:
     # Option to download predictions
     csv = final_results.to_csv(index=False).encode('utf-8')
     st.download_button("Download Predictions", data=csv, file_name="predictions.csv", mime="text/csv")
+
 
