@@ -92,15 +92,31 @@ def make_predictions(X):
 st.title("🔧 Tool Wear Prediction App")
 st.markdown(
     """
-    ## 📌 Overview
-    This project focuses on analyzing **CNC milling machine performance** and detecting faults using **deep learning techniques**. 
-    The primary objective is to predict:
-    - 🛠 **Tool Condition** (Unworn/Worn)
-    - ⚙️ **Machining Finalization** (Yes/No)
-    - 🔍 **Passed Visual Inspection** (Yes/No)
-    
-    Using **LSTM-based deep learning models**, the project processes **sensor data** collected from CNC milling experiments. 
-    The web app is built with **Streamlit** for an interactive experience.
+    ## if choice == "Home":
+    st.title("🔬 Tool Wear Prediction using LSTM")
+    st.markdown(
+        """
+        🔬 Overview
+         Predictive maintenance is revolutionizing manufacturing by minimizing tool failure and optimizing machining processes. 
+         This LSTM-based AI model analyzes real-time CNC sensor data to predict tool wear, ensuring efficiency and precision in machining operations.
+
+        ⚙️ How It Works?
+        1️⃣ Real-Time Data Collection 📊
+            Captures sensor readings (spindle speed, vibration, temperature, force).
+        2️⃣ Data Preprocessing & Feature Engineering 🧩
+            Normalizes values, removes noise, and extracts critical features.
+        3️⃣ LSTM Model for Pattern Recognition 🧠
+            Uses sequential data to detect wear progression trends.
+        4️⃣ Prediction & Decision Support ✅
+            Provides insights into tool condition and remaining lifespan.
+        5️⃣ Integration with Smart Manufacturing Systems 🌍
+            Sends alerts for tool replacement, reducing unplanned downtimes.
+            
+        📈 Key Benefits
+           🔹 Prevents Costly Failures – Reduces sudden tool breakage and machine damage.
+           🔹 Optimizes Tool Usage – Ensures tools are replaced at the right time.
+           🔹 Enhances Product Quality – Minimizes defects caused by worn-out tools.
+           🔹 Boosts Production Efficiency – Reduces machining interruptions and improves workflow.
     """
 )
 st.write("Upload your CSV file to predict tool wear conditions.")
