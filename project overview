@@ -1,5 +1,8 @@
 📌 Overview
-This project focuses on analyzing CNC milling machine performance and detecting faults using deep learning techniques. The primary objective is to predict tool wear condition, machining finalization status, and passed visual inspection using time-series sensor data collected from CNC milling experiments. The project includes data collection, preprocessing, deep learning model training (LSTM), and deployment via Streamlit.
+This project focuses on analyzing CNC milling machine performance and detecting faults using deep learning 
+techniques. The primary objective is to predict tool wear condition, machining finalization status, and passed visual 
+inspection using time-series sensor data collected from CNC milling experiments. The project includes data 
+collection, preprocessing, deep learning model training (LSTM), and deployment via Streamlit.
 
 📂 Project Structure
 CNC-Milling-Performance-Analysis-and-Fault-Detection/
@@ -74,4 +77,4 @@ Enhanced visualization with background customization.
 
 🔗 Links
 📂 GitHub Repository: https://github.com/Durgadevi3105/CNC_TOOL-WEAR_PREDICTION
-🌐 Streamlit Web App: https://obscure-waddle-7vp4g949w9wqfprq7-8501.app.github.dev/
+🌐 Streamlit Web App: https://obscure-waddle-7vp4g949w9wqfprq7-8501.app.github.dev
