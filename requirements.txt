@@ -1,5 +1,6 @@
-numpy
-pickle
-base64
-tensorflow
-pandas
+streamlit
+tensorflow==2.12.0
+numpy==1.26.4
+scipy
+Scikit-learn
+keras
